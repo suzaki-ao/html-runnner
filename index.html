@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTMLランチャー — 自分のHTMLを実行</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#121a2e;--panel2:#18233c;--line:#2b3957;--text:#edf3ff;--muted:#9eacc7;--accent:#7c9cff;--good:#6ee7b7;--warn:#ffd27d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1000px 600px at 10% -10%,#24365f 0,transparent 60%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:26px clamp(16px,4vw,48px) 20px;border-bottom:1px solid var(--line);background:#0b1020cc;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#8ca8ff,#8a5cf6);display:grid;place-items:center;font-weight:900;color:#fff;font-size:17px;box-shadow:0 8px 28px #6655ff44}
+h1{font-size:clamp(20px,3vw,29px);margin:0}.subtitle{margin:5px 0 0;color:var(--muted);font-size:13px}
+main{max-width:1400px;margin:auto;padding:24px clamp(14px,3vw,36px) 50px;display:grid;grid-template-columns:minmax(290px,370px) minmax(0,1fr);gap:20px}
+.card{background:linear-gradient(180deg,#151f35,#11182a);border:1px solid var(--line);border-radius:18px;overflow:hidden;min-width:0;box-shadow:0 16px 40px #0002}.cardhead{padding:17px 19px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.cardhead h2{font-size:16px;margin:0}.body{padding:18px}
+.drop{border:1.5px dashed #50648f;border-radius:14px;padding:24px 14px;text-align:center;background:#0c1427;transition:.2s}.drop.drag{border-color:var(--accent);background:#17254a}.drop strong{display:block;font-size:15px;margin-bottom:5px}.drop p{font-size:12px;color:var(--muted);margin:0 0 13px}
+button,.filebutton{border:1px solid #435681;background:#243352;color:var(--text);padding:9px 13px;border-radius:10px;font:inherit;font-size:13px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:7px}button:hover,.filebutton:hover{filter:brightness(1.18);transform:translateY(-1px)}button.primary{background:linear-gradient(135deg,#6486ff,#7858e8);border-color:transparent;color:white;font-weight:700}button.ghost{background:transparent}button.danger{background:#4b2634;border-color:#814052}button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+input[type=file]{display:none}label{display:block;font-size:12px;color:var(--muted);margin:17px 0 7px}input[type=text],select{width:100%;background:#0b1324;border:1px solid var(--line);border-radius:9px;padding:10px;color:var(--text);font:inherit;font-size:13px}
+.fileinfo{margin-top:14px;padding:12px;border-radius:11px;background:#0c1427;border:1px solid var(--line);display:none}.fileinfo strong{display:block;overflow-wrap:anywhere}.fileinfo small{color:var(--muted)}
+.filelist{display:grid;gap:8px;margin-top:15px}.fileitem{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#0d1528}.fileicon{width:34px;height:34px;flex:none;border-radius:9px;background:#26395d;display:grid;place-items:center;font-size:11px;font-weight:800}.filelabel{min-width:0;flex:1}.filelabel strong{display:block;font-size:12px;overflow-wrap:anywhere}.filelabel small{color:var(--muted);font-size:11px}.fileitem button{padding:6px 8px;font-size:11px}
+.hint{color:var(--muted);font-size:12px;margin:14px 0 0}.notice{border-left:3px solid var(--warn);padding:10px 12px;background:#2a2418;border-radius:0 9px 9px 0;font-size:12px;color:#ffe5b0;margin-top:16px}
+.workspace{display:flex;flex-direction:column;min-height:650px}.toolbar{padding:12px 15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line)}.status{margin-left:auto;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}.dot{width:7px;height:7px;border-radius:50%;background:#65738e}.dot.on{background:var(--good);box-shadow:0 0 10px #6ee7b755}
+.previewwrap{flex:1;min-height:420px;background:#080d18;padding:14px;display:flex;flex-direction:column}.previewtop{font-size:11px;color:var(--muted);padding:0 2px 10px;display:flex;justify-content:space-between;gap:10px}.framebox{flex:1;min-height:390px;border:1px solid #33415e;border-radius:12px;overflow:hidden;background:white;position:relative}.framebox iframe{width:100%;height:100%;min-height:390px;border:0;background:white}.empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#7c8aa5;background:linear-gradient(135deg,#111a2c,#0b1120);padding:20px}.empty .big{font-size:48px;margin-bottom:8px}.empty strong{display:block;color:#dce6ff;font-size:17px}.empty p{max-width:360px;font-size:12px}.console{border-top:1px solid var(--line);padding:12px 16px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer{text-align:center;color:#71809c;font-size:11px;padding:0 15px 25px}
+@media(max-width:850px){main{grid-template-columns:1fr}.workspace{min-height:600px}.previewwrap{min-height:470px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">&lt;/&gt;</div><div><h1>HTMLランチャー</h1><p class="subtitle">自分のHTMLファイルを読み込んで、その場でプレビュー・実行</p></div></div></header>
+<main>
+<section class="card">
+ <div class="cardhead"><h2>📂 ファイルを読み込む</h2><span style="font-size:11px;color:var(--muted)">HTML / HTM</span></div>
+ <div class="body">
+  <div class="drop" id="drop">
+   <strong>HTMLファイルをここにドロップ</strong>
+   <p>またはファイルを選んでください</p>
+   <label class="filebutton" for="fileInput" style="display:inline-flex;margin:0">ファイルを選択</label>
+   <input id="fileInput" type="file" accept=".html,.htm,text/html">
+  </div>
+  <div class="fileinfo" id="fileinfo"><strong id="filename"></strong><small id="filesize"></small></div>
+  <label for="projectName">表示名（任意）</label><input id="projectName" type="text" placeholder="例：自作ツール v0.0.1">
+  <label for="mode">実行方法</label>
+  <select id="mode"><option value="sandbox">安全寄り（推奨）— 外部サイトへの操作を制限</option><option value="full">互換性優先 — 一部の制限を緩和</option></select>
+  <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+   <button class="primary" id="runBtn" disabled>▶ 実行・プレビュー</button><button id="downloadBtn" disabled>↓ 元ファイルを保存</button>
+  </div>
+  <div class="notice"><b>注意：</b>知らないHTMLは実行しないでください。HTML内のJavaScriptは動作します。外部ファイル（CSS・JS・画像）を参照するHTMLは、単体読み込みでは表示が崩れる場合があります。</div>
+  <p class="hint">このページは選択したHTMLをブラウザー内で読み込みます。ファイルをサーバーへアップロードする機能はありません。</p>
+  <div style="margin-top:23px;display:flex;align-items:center;justify-content:space-between;gap:8px"><b style="font-size:13px">このページで選択したファイル</b><button class="ghost" id="clearBtn">クリア</button></div>
+  <div class="filelist" id="filelist"><div class="hint">まだファイルがありません。</div></div>
+ </div>
+</section>
+<section class="card workspace">
+ <div class="cardhead"><h2>🖥️ 実行プレビュー</h2><span id="previewTitle" style="font-size:12px;color:var(--muted)">待機中</span></div>
+ <div class="toolbar"><button id="refreshBtn" disabled>↻ 再読み込み</button><button id="newTabBtn" disabled>↗ 別タブで開く</button><button id="stopBtn" disabled>■ 停止</button><div class="status"><span class="dot" id="dot"></span><span id="statusText">HTML未選択</span></div></div>
+ <div class="previewwrap"><div class="previewtop"><span>ローカルプレビュー</span><span id="sizeText">—</span></div><div class="framebox"><div class="empty" id="empty"><div><div class="big">⌘</div><strong>ここにプレビューが表示されます</strong><p>左側からHTMLファイルを選び、「実行・プレビュー」を押してください。</p></div></div><iframe id="preview" title="HTMLプレビュー" sandbox="allow-scripts allow-forms allow-modals allow-popups" style="display:none"></iframe></div></div>
+ <div class="console"><span id="message">準備完了。HTMLファイルを選択してください。</span><span>ブラウザー内で動作</span></div>
+</section>
+</main>
+<footer>HTMLランチャー · 選択したファイルはこのページ内で処理されます</footer>
+<script>
+(() => {
+ const $ = id => document.getElementById(id);
+ let selectedFile = null, source = '', currentUrl = '', historyFiles = [];
+ const revoke = () => { if(currentUrl){ URL.revokeObjectURL(currentUrl); currentUrl=''; } };
+ const fmt = n => n < 1024 ? n+' B' : n < 1024*1024 ? (n/1024).toFixed(1)+' KB' : (n/1024/1024).toFixed(2)+' MB';
+ function setStatus(text,on=false){$('statusText').textContent=text;$('dot').classList.toggle('on',on)}
+ function updateFile(file,content){
+  selectedFile=file;source=content;
+  $('fileinfo').style.display='block';$('filename').textContent=file.name;$('filesize').textContent=fmt(file.size)+' · HTMLファイル';
+  $('projectName').value=$('projectName').value||file.name.replace(/\.html?$/i,'');
+  $('runBtn').disabled=false;$('downloadBtn').disabled=false;
+  historyFiles=historyFiles.filter(x=>x.name!==file.name);historyFiles.unshift({name:file.name,size:file.size});
+  renderList();$('message').textContent='読み込み完了：'+file.name;setStatus('実行待ち',false);
+ }
+ function renderList(){
+  const box=$('filelist');box.innerHTML='';
+  if(!historyFiles.length){box.innerHTML='<div class="hint">まだファイルがありません。</div>';return}
+  historyFiles.forEach(f=>{const el=document.createElement('div');el.className='fileitem';el.innerHTML='<div class="fileicon">HTML</div><div class="filelabel"><strong></strong><small></small></div><button type="button">現在のファイル</button>';el.querySelector('strong').textContent=f.name;el.querySelector('small').textContent=fmt(f.size);el.querySelector('button').disabled=!selectedFile||selectedFile.name!==f.name;box.appendChild(el)});
+ }
+ async function readFile(file){
+  if(!file)return;
+  if(!/\.(html?|HTML?)$/.test(file.name) && file.type!=='text/html'){alert('HTML / HTM ファイルを選択してください。');return}
+  try{const text=await file.text();updateFile(file,text)}catch(e){alert('ファイルを読み込めませんでした。')}
+ }
+ function run(){
+  if(!selectedFile)return;
+  revoke();
+  const mode=$('mode').value;
+  const blob=new Blob([source],{type:'text/html;charset=utf-8'});currentUrl=URL.createObjectURL(blob);
+  const frame=$('preview');frame.removeAttribute('srcdoc');frame.src=currentUrl;frame.style.display='block';$('empty').style.display='none';
+  if(mode==='full') frame.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-same-origin');
+  else frame.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups');
+  $('previewTitle').textContent=$('projectName').value.trim()||selectedFile.name;
+  $('sizeText').textContent=fmt(selectedFile.size);$('refreshBtn').disabled=false;$('newTabBtn').disabled=false;$('stopBtn').disabled=false;
+  setStatus('実行中',true);$('message').textContent='プレビューを開始しました。ブラウザーの制限により一部機能は動作しないことがあります。';
+ }
+ function stop(){const frame=$('preview');frame.removeAttribute('src');frame.style.display='none';$('empty').style.display='grid';revoke();$('stopBtn').disabled=true;$('refreshBtn').disabled=true;$('newTabBtn').disabled=true;setStatus('停止中',false);$('previewTitle').textContent='停止しました';$('message').textContent='プレビューを停止しました。'}
+ $('fileInput').addEventListener('change',e=>{readFile(e.target.files[0]);e.target.value=''});
+ $('runBtn').addEventListener('click',run);$('refreshBtn').addEventListener('click',run);$('stopBtn').addEventListener('click',stop);
+ $('downloadBtn').addEventListener('click',()=>{if(!selectedFile)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([source],{type:'text/html;charset=utf-8'}));a.download=selectedFile.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
+ $('newTabBtn').addEventListener('click',()=>{if(!selectedFile)return;const blob=new Blob([source],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);const w=window.open(url,'_blank','noopener');if(!w){alert('新しいタブがブロックされました。ブラウザーのポップアップ設定を確認してください。')}setTimeout(()=>URL.revokeObjectURL(url),60000)});
+ $('clearBtn').addEventListener('click',()=>{stop();selectedFile=null;source='';historyFiles=[];$('fileinfo').style.display='none';$('runBtn').disabled=true;$('downloadBtn').disabled=true;$('filelist').innerHTML='<div class="hint">まだファイルがありません。</div>';$('projectName').value='';$('message').textContent='選択内容をクリアしました。';$('previewTitle').textContent='待機中';setStatus('HTML未選択',false)});
+ const drop=$('drop');
+ ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
+ ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
+ drop.addEventListener('drop',e=>readFile(e.dataTransfer.files[0]));
+ window.addEventListener('beforeunload',revoke);
+})();
+</script>
+</body>
+</html>
